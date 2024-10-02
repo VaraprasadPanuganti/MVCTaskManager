@@ -1,1 +1,4 @@
 ﻿1)New-EventLog -LogName Application -Source "MVCTaskManager" -- used tp craete the source for logging(Open powershell in admin mode and run this command) 
+2)DECLARE @Result INT;
+exec UpdateProject @ProjectId=5,@ProjectName='CSM Team',  @DateOfStart='2024-10-24 00:00:00.000', @TeamSize=8,@Result=@Result OUTPUT
+Select @Result
