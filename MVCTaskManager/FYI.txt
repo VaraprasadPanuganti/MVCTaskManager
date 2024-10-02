@@ -1,1 +1,1 @@
-﻿New-EventLog -LogName Application -Source "MVCTaskManager" -- used tp craete the source for logging(Open powershell in admin mode and run this command) 
+﻿1)New-EventLog -LogName Application -Source "MVCTaskManager" -- used tp craete the source for logging(Open powershell in admin mode and run this command) 
