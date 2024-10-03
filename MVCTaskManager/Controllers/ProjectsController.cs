@@ -82,6 +82,10 @@ namespace MVCTaskManager.Controllers
         {
             try
             {
+                if (project.ProjectId <= 0 || string.IsNullOrWhiteSpace(project.ProjectName) || project.TeamSize <= 0 || project.DateOfStart == DateTime.MinValue)
+                {
+                    return BadRequest("One of the Project parameter is null or empty.");
+                }
                 using (SqlConnection sqlConnection = new SqlConnection(connectionString))
                 {
                     await sqlConnection.OpenAsync();
