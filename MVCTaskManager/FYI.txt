@@ -2,3 +2,52 @@
 2)DECLARE @Result INT;
 exec UpdateProject @ProjectId=5,@ProjectName='CSM Team',  @DateOfStart='2024-10-24 00:00:00.000', @TeamSize=8,@Result=@Result OUTPUT
 Select @Result
+3)CREATE TABLE Users (
+    UserSeqNum INT IDENTITY(1,1) NOT NULL,         -- Auto-incremented sequential number
+	UserID AS CONCAT(UserName, RIGHT('000' + CAST(UserSeqNum AS VARCHAR(3)), 3)) PERSISTED,  -- UserID is a combination of UserName and a formatted sequence number
+    UserName NVARCHAR(50) NOT NULL,                -- User name
+    Email NVARCHAR(100) NOT NULL UNIQUE,           -- Email address
+    PasswordHash NVARCHAR(255) NOT NULL,           -- Password hash
+    Role NVARCHAR(50) NOT NULL,                    -- User role
+    CreatedAt DATETIME DEFAULT GETDATE(),          -- Date created
+    PRIMARY KEY (UserID)                       -- Primary key is the sequential number
+);
+
+INSERT INTO Users (UserName, Email, PasswordHash, Role)
+VALUES ('John', 'john@example.com', 'hashed_password_1', 'Admin');
+
+INSERT INTO Users (UserName, Email, PasswordHash, Role)
+VALUES ('Alice', 'alice@example.com', 'hashed_password_2', 'User');
+
+DROP TABLE TableName;
+
+4)Microsoft.AspNetCore.Authentication.JwtBearer
+System.IdentityModel.Tokens.Jwt
+
+5)--create ClientLocations table
+CREATE TABLE ClientLocations (
+    clientLocationId VARCHAR(10) PRIMARY KEY, -- Store ID as VARCHAR for 'cl_001' format
+    clientLocationName VARCHAR(255) NOT NULL -- Location name
+);
+-- Create the trigger to auto-generate clientLocationId in 'cl_001' format
+CREATE TRIGGER generate_clientLocationId
+ON ClientLocations
+INSTEAD OF INSERT
+AS
+BEGIN
+    DECLARE @nextId INT;
+
+    -- Find the next available number for clientLocationId
+    SELECT @nextId = COALESCE(MAX(CAST(SUBSTRING(clientLocationId, 4, 3) AS INT)), 0) + 1
+    FROM ClientLocations;
+
+    -- Insert the new rows with the generated clientLocationId
+    INSERT INTO ClientLocations (clientLocationId, clientLocationName)
+    SELECT 
+        CONCAT('cl_', RIGHT('000' + CAST(@nextId AS VARCHAR(3)), 3) ) AS clientLocationId,
+        clientLocationName
+    FROM inserted; -- 'inserted' is a special table holding new rows
+END;
+--insert query
+INSERT INTO ClientLocations (clientLocationName)
+VALUES ('Australia');
