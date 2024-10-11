@@ -3,7 +3,7 @@ using MVCTaskManager.JWT;
 using MVCTaskManager.Models;
 using MVCTaskManager.Repositories.Interfaces;
 using MVCTaskManager.Services.Interfaces;
-using System.Collections.Generic;
+using MVCTaskManager.SHA256Gen;
 using System.Data;
 
 namespace MVCTaskManager.Services
@@ -15,7 +15,39 @@ namespace MVCTaskManager.Services
         public AccountService(IAccountRepository _accountRepository, IConfiguration _configuration)
         {
             accountRepository = _accountRepository;
-           configuration = _configuration; 
+            configuration = _configuration;
+        }
+
+        public async Task<LoginResponse> FindUserbyEmail(PasswordResetRequest passwordResetRequest)
+        {
+            DataTable dtUser = await accountRepository.FindUserbyEmail(passwordResetRequest);
+            if (dtUser != null && dtUser.Rows.Count > 0)
+            {
+                LoginResponse loginResponse = await CommonHelper.ConvertDataTableClass<LoginResponse>(dtUser);
+      
+                return loginResponse;
+            }
+            else
+            {
+                return new LoginResponse();
+            }
+
+        }
+
+        public async Task<LoginResponse> GetUserById(string UserId)
+        {
+            DataTable dtUser = await accountRepository.GetUserById(UserId);
+            if (dtUser != null && dtUser.Rows.Count > 0)
+            {
+                LoginResponse loginResponse = await CommonHelper.ConvertDataTableClass<LoginResponse>(dtUser);
+
+                return loginResponse;
+            }
+            else
+            {
+                return new LoginResponse();
+            }
+
         }
 
         public async Task<List<LoginResponse>> Login(LoginRequest loginRequest)
@@ -32,6 +64,13 @@ namespace MVCTaskManager.Services
             {
                 return new List<LoginResponse>();
             }
+        }
+
+        public async Task<int> UpdateUserPassword(string userId, string password)
+        {
+            string passwordhash = SHA256HashGenerator.GenerateHash(password);
+            int result = await accountRepository.UpdateUserPassword(userId, passwordhash);
+            return result;
         }
     }
 }

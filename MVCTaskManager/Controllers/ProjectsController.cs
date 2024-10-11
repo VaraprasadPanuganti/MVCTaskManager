@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using MVCTaskManager.Common;
 using MVCTaskManager.Models;
 using MVCTaskManager.Services.Interfaces;
-using System.Data;
 
 namespace MVCTaskManager.Controllers
 {

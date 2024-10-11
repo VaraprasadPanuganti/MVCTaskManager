@@ -40,5 +40,34 @@ namespace MVCTaskManager.Common
             }
         }
 
+        public static async Task<T> ConvertDataTableClass<T>(DataTable table) where T : new()
+        {
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    T obj = new T();
+
+                    // Loop through the properties of the class
+                    foreach (var prop in typeof(T).GetProperties())
+                    {
+                        if (table.Columns.Contains(prop.Name) && table.Rows[0][prop.Name] != DBNull.Value)
+                        {
+                            // Set the property value from the DataTable row
+                            prop.SetValue(obj, Convert.ChangeType(table.Rows[0][prop.Name], prop.PropertyType), null);
+                        }
+                    }
+
+                    return obj;
+                });
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex.Message, "ConvertDataTableToList Error Message");
+                // _logger.LogError(ex.StackTrace, "ConvertDataTableToList Error StackTrace");
+                return default;
+            }
+        }
+
     }
 }

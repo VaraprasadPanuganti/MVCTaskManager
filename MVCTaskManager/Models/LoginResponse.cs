@@ -7,5 +7,6 @@
         public string? UserId { get; set; }
         public string? Role { get; set; }
         public string? token { get; set; }
+        public string? SecurityStamp { get; set; }
     }
 }

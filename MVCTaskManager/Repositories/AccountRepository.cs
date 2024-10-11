@@ -16,6 +16,36 @@ namespace MVCTaskManager.Repositories
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public async Task<DataTable> FindUserbyEmail(PasswordResetRequest passwordResetRequest)
+        {
+            DataTable dataTable = new DataTable();
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                await sqlConnection.OpenAsync();
+                SqlCommand sqlCommand = new SqlCommand("FindUsersByEmail", sqlConnection);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.Add(new SqlParameter("@Email", passwordResetRequest.EmailId));
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
+                sqlDataAdapter.Fill(dataTable);
+               
+            }
+            return dataTable;
+        }
+
+        public async Task<DataTable> GetUserById(string UserId)
+        {
+            DataTable dataTable = new DataTable();
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                await sqlConnection.OpenAsync();
+                SqlCommand sqlCommand = new SqlCommand($"select * from users where UserID='{UserId}'", sqlConnection);
+                sqlCommand.CommandType = CommandType.Text;
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
+                sqlDataAdapter.Fill(dataTable);
+                return dataTable;
+            }
+        }
+
         public async Task<DataTable> Login(LoginRequest loginRequest)
         {
             DataTable userDetails = new DataTable();
@@ -30,6 +60,28 @@ namespace MVCTaskManager.Repositories
                 sqlDataAdapter.Fill(userDetails);
             }
             return userDetails;
+        }
+
+        public async Task<int> UpdateUserPassword(string userId, string password)
+        {
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                await sqlConnection.OpenAsync();
+                SqlCommand sqlCommand = new SqlCommand("UpdateUserPassword", sqlConnection);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.Add(new SqlParameter("@UserId", userId));
+                sqlCommand.Parameters.Add(new SqlParameter("@Password", password));
+                SqlParameter outputParam = new SqlParameter("@Result", SqlDbType.Int)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                sqlCommand.Parameters.Add(outputParam);
+                await sqlCommand.ExecuteNonQueryAsync();
+
+                //Get the value of output param
+                int result = (int)outputParam.Value;
+                return result;
+            }
         }
     }
 }
